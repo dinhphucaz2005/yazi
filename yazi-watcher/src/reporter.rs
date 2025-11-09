@@ -1,5 +1,5 @@
 use tokio::sync::mpsc;
-use yazi_shared::{scheme::SchemeRef, url::{AsUrl, Url, UrlBuf, UrlCow, UrlLike}};
+use yazi_shared::{path::PathLike, scheme::SchemeRef, url::{AsUrl, Url, UrlBuf, UrlCow, UrlLike}};
 
 use crate::{WATCHED, local::LINKED};
 
@@ -50,7 +50,7 @@ impl Reporter {
 
 	fn report_remote<'a>(&self, url: UrlCow<'a>) {
 		let Some(parent) = url.parent() else { return };
-		if !WATCHED.read().contains(&url) {
+		if !WATCHED.read().contains(parent) {
 			return;
 		}
 

@@ -5,8 +5,9 @@ use hashbrown::HashSet;
 use notify::{PollWatcher, RecommendedWatcher, RecursiveMode, Watcher};
 use tokio::{pin, sync::mpsc::{self, UnboundedReceiver}};
 use tokio_stream::{StreamExt, wrappers::UnboundedReceiverStream};
+use tracing::error;
 use yazi_fs::{File, FilesOp, provider};
-use yazi_shared::url::{UrlBuf, UrlLike};
+use yazi_shared::{path::PathLike, url::{UrlBuf, UrlLike}};
 use yazi_vfs::VfsFile;
 
 use crate::{Reporter, WATCHER};
@@ -26,10 +27,16 @@ impl Local {
 			}
 		};
 
-		Self(if yazi_adapter::WSL.get() || cfg!(target_os = "netbsd") {
-			Box::new(PollWatcher::new(handler, config).unwrap())
-		} else {
-			Box::new(RecommendedWatcher::new(handler, config).unwrap())
+		if cfg!(target_os = "netbsd") || yazi_adapter::WSL.get() {
+			return Self(Box::new(PollWatcher::new(handler, config).unwrap()));
+		}
+
+		Self(match RecommendedWatcher::new(handler.clone(), config) {
+			Ok(watcher) => Box::new(watcher),
+			Err(e) => {
+				error!("Falling back to PollWatcher due to RecommendedWatcher init failure: {e:?}");
+				Box::new(PollWatcher::new(handler, config).unwrap())
+			}
 		})
 	}
 
@@ -63,18 +70,18 @@ impl Local {
 			for u in urls {
 				let Some((parent, urn)) = u.pair() else { continue };
 				let Ok(file) = File::new(&u).await else {
-					ops.push(FilesOp::Deleting(parent.into(), [urn.into()].into()));
+					ops.push(FilesOp::Deleting(parent.into(), [urn.owned()].into()));
 					continue;
 				};
 
 				if let Some(p) = file.url.as_path()
 					&& !provider::local::must_case_match(p).await
 				{
-					ops.push(FilesOp::Deleting(parent.into(), [urn.into()].into()));
+					ops.push(FilesOp::Deleting(parent.into(), [urn.owned()].into()));
 					continue;
 				}
 
-				ops.push(FilesOp::Upserting(parent.into(), [(urn.into(), file)].into()));
+				ops.push(FilesOp::Upserting(parent.into(), [(urn.owned(), file)].into()));
 			}
 
 			FilesOp::mutate(ops);
