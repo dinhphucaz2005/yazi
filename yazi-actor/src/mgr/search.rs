@@ -75,6 +75,12 @@ impl Actor for SearchDo {
 					subject: opt.subject.into_owned(),
 					args: opt.args,
 				}),
+				SearchOptVia::Musicndp => external::musicndp(external::MusicndpOpt {
+					cwd: cwd.clone(),
+					hidden,
+					subject: opt.subject.into_owned(),
+					args: opt.args,
+				}),
 			}?;
 
 			let rx = UnboundedReceiverStream::new(rx).chunks_timeout(5000, Duration::from_millis(500));
