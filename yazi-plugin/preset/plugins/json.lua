@@ -32,6 +32,20 @@ function M:peek(job)
 		ya.emit("peek", { math.max(0, i - limit), only_if = job.file.url, upper_bound = true })
 	else
 		lines = lines:gsub("\t", string.rep(" ", rt.preview.tab_size))
+		-- loại bỏ ANSI escape
+        local clean = lines:gsub("\27%[[%d;]+m", "")
+
+        -- tìm cover bằng pattern
+        local cover_path = clean:match('"cover"%s*:%s*"(.-)"')
+        local rec = ui.Rect {
+            x = job.area.x,
+            y = job.area.y + 10,
+            w = job.area.w,
+            h = job.area.h,
+        }
+        local url = Url(cover_path)
+        ya.image_show(url, rec)
+
 		ya.preview_widget(
 			job,
 			ui.Text.parse(lines):area(job.area):wrap(rt.preview.wrap == "yes" and ui.Wrap.YES or ui.Wrap.NO)
