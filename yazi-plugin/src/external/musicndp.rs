@@ -46,10 +46,7 @@ fn spawn(program: &str, opt: &MusicndpOpt) -> std::io::Result<Child> {
 	};
 
 	Command::new(program)
-		.arg("--base-directory")
-		.arg(path)
-		.arg("--regex")
-		.arg(if opt.hidden { "--hidden" } else { "--no-hidden" })
+		.arg("--query")
 		.args(&opt.args)
 		.arg(&opt.subject)
 		.kill_on_drop(true)
