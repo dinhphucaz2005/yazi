@@ -53,7 +53,7 @@ pub enum SearchOptVia {
 	Rg,
 	Rga,
 	Fd,
-	Musicndp,
+	Beatcmd,
 }
 
 impl FromStr for SearchOptVia {
@@ -70,7 +70,7 @@ impl SearchOptVia {
 			Self::Rg => "rg",
 			Self::Rga => "rga",
 			Self::Fd => "fd",
-			Self::Musicndp => "musicndp",
+			Self::Beatcmd => "beatcmd",
 		}
 	}
 }

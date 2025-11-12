@@ -75,7 +75,7 @@ impl Actor for SearchDo {
 					subject: opt.subject.into_owned(),
 					args: opt.args,
 				}),
-				SearchOptVia::Musicndp => external::musicndp(external::MusicndpOpt {
+				SearchOptVia::Beatcmd => external::beatcmd(external::BeatcmdOpt {
 					cwd: cwd.clone(),
 					hidden,
 					subject: opt.subject.into_owned(),

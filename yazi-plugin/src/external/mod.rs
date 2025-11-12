@@ -1,1 +1,1 @@
-yazi_macro::mod_flat!(fd highlighter rg rga musicndp);
+yazi_macro::mod_flat!(fd highlighter rg rga beatcmd);

@@ -10,15 +10,15 @@ use yazi_fs::File;
 use yazi_shared::url::{UrlBuf, UrlLike};
 use yazi_vfs::VfsFile;
 
-pub struct MusicndpOpt {
+pub struct BeatcmdOpt {
 	pub cwd: UrlBuf,
 	pub hidden: bool,
 	pub subject: String,
 	pub args: Vec<String>,
 }
 
-pub fn musicndp(opt: MusicndpOpt) -> Result<UnboundedReceiver<File>> {
-	let mut child = spawn("musicndp", &opt)?;
+pub fn beatcmd(opt: BeatcmdOpt) -> Result<UnboundedReceiver<File>> {
+	let mut child = spawn("beatcmd", &opt)?;
 
 	let mut it = BufReader::new(child.stdout.take().unwrap()).lines();
 	let (tx, rx) = mpsc::unbounded_channel();
@@ -36,17 +36,16 @@ pub fn musicndp(opt: MusicndpOpt) -> Result<UnboundedReceiver<File>> {
 	Ok(rx)
 }
 
-
-fn spawn(program: &str, opt: &MusicndpOpt) -> std::io::Result<Child> {
+fn spawn(program: &str, opt: &BeatcmdOpt) -> std::io::Result<Child> {
 	let Some(path) = opt.cwd.as_path() else {
 		return Err(std::io::Error::new(
 			std::io::ErrorKind::InvalidInput,
-			"musicndp can only search local filesystem",
+			"beatcmd can only search local filesystem",
 		));
 	};
 
 	Command::new(program)
-		.arg("--query")
+		.arg("--search")
 		.args(&opt.args)
 		.arg(&opt.subject)
 		.kill_on_drop(true)
