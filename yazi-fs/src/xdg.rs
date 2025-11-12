@@ -22,7 +22,7 @@ impl Xdg {
 				.map(PathBuf::from)
 				.filter(|p| p.is_absolute())
 				.or_else(|| dirs::home_dir().map(|h| h.join(".config")))
-				.map(|p| p.join("yazi"))
+				.map(|p| p.join("beatshell"))
 				.expect("Failed to get config directory")
 		}
 	}
@@ -53,7 +53,7 @@ impl Xdg {
 			#[cfg(unix)]
 			{
 				use uzers::Users;
-				p.push(format!("yazi-{}", yazi_shared::USERS_CACHE.get_current_uid()))
+				p.push(format!("beatshell-{}", yazi_shared::USERS_CACHE.get_current_uid()))
 			}
 			#[cfg(not(unix))]
 			p.push("yazi");
