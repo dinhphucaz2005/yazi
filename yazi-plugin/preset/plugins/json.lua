@@ -36,7 +36,7 @@ function M:peek(job)
         local clean = lines:gsub("\27%[[%d;]+m", "")
 
         -- tìm cover bằng pattern
-        local cover_path = clean:match('"cover"%s*:%s*"(.-)"')
+        local cover_path = clean:match('"thumbnail"%s*:%s*"(.-)"')
         local rec = ui.Rect {
             x = job.area.x,
             y = job.area.y + 10,
